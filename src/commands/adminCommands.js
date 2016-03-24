@@ -69,6 +69,27 @@ function AdminCommands(message, bot, Data) {
 			`**${addedChannel ? 'P' : 'No longer p'}osting images to:** ${channelString}.`
 		);
 	}
+	else if(/^>join/.test(message.content)) {
+		console.log('>Received join command.');
+		if(/^>join(\s*https?:\/\/discord\.gg\/[A-Za-z0-9]+\s*)+$/.test(message.content)) {
+			const invites = message.content.match(/https?:\/\/discord\.gg\/[A-Za-z0-9]+/gi);
+			_.forEach(invites, (invite) => {
+				bot.joinServer(invite);
+			});
+			bot.sendMessage(
+				message.channel,
+				'**Joined Servers.**'
+			);
+			console.log('>Joined server(s).');
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**Invalid parameters.**'
+			);
+			console.log('>Invalid parameters.');
+		}
+	}
 }
 
 export default AdminCommands;

@@ -1,0 +1,5 @@
+module.exports = {
+    email: 'username@email.com',
+    password: 'password',
+    owner: '1234567890'
+};

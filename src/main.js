@@ -2,13 +2,14 @@ import _ from 'lodash';
 import Discord from 'discord.js';
 
 import Config from '../config.conf';
-import Data from './data';
 
+import Data from './data';
 import CollectImages from './collectImages';
-import CommonCommands from './commonCommands';
-import UserCommands from './userCommands';
-import AdminCommands from './adminCommands';
-import OwnerCommands from './ownerCommands';
+
+import CommonCommands from './commands/commonCommands';
+import UserCommands from './commands/userCommands';
+import AdminCommands from './commands/adminCommands';
+import OwnerCommands from './commands/ownerCommands';
 
 var bot = new Discord.Client();
 
@@ -25,6 +26,9 @@ bot.on('ready', () => {
 });
 
 bot.on('message', (message) => {
+	if(message.author.id === bot.internal.user.id) {
+		return;
+	}
 	if(message.author.id === Config.owner) {
 		OwnerCommands(message, bot, Data);
 		AdminCommands(message, bot, Data);

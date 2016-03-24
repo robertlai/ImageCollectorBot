@@ -54,6 +54,7 @@ function CommonCommands(message, bot, Data) {
 			'>unlisten - Remove a user from the user list\n' +
 			'>postImg - Toggle posting images to a channel'
 		);
+		console.log('>Posted command list.');
 	}
 }
 

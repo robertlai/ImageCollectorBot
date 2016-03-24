@@ -1,0 +1,22 @@
+{
+  "name": "img-bot",
+  "version": "1.0.0",
+  "description": "A bot that collects and reposts images",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Robert Lai",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
+    "discord.js": "^6.1.0",
+    "eslint": "^1.10.3",
+    "lodash": "^4.1.0"
+  },
+  "engines": {
+    "node": "4.1.x",
+    "npm": "2.14.x"
+  }
+}

@@ -7,6 +7,7 @@ var Data = {
 	outChannels: [],
 	users: [],
 	admin: [],
+	blacklist: [],
 	loadData() {
 		console.log('>Loading data...');
 		try {

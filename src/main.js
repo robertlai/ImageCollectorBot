@@ -48,7 +48,8 @@ bot.on('message', (message) => {
 		CommonCommands(message, bot, Data);
 	}
 
-	if(_.map(Data.inChannels, 'id').indexOf(message.channel.id) !== -1) {
+	if(_.map(Data.inChannels, 'id').indexOf(message.channel.id) !== -1 &&
+		_.map(Data.blacklist, 'id').indexOf(message.author.id) === -1) {
 		CollectImages(message, bot, Data);
 	}
 });

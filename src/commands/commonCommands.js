@@ -23,6 +23,17 @@ function CommonCommands(message, bot, Data) {
 		);
 		console.log('>Posted admin list.');
 	}
+	else if(/^>blacklist$/.test(message.content)) {
+		console.log('>Received blacklist command.');
+		const blacklist = _.map(Data.blacklist, (user) => {
+			return `- ${user.username} (${user.id})`;
+		});
+		bot.sendMessage(
+			message.channel,
+			'**Blacklist:**\n' + blacklist.join('\n')
+		);
+		console.log('>Posted blacklist.');
+	}
 	else if(/^>channels$/.test(message.content)) {
 		console.log('>Received channels command.');
 		const inChannelList = _.map(Data.inChannels, (channel) => {
@@ -46,14 +57,19 @@ function CommonCommands(message, bot, Data) {
 			'>help - List commands\n' +
 			'>users - List users in user list\n' +
 			'>admin - List users in admin list\n' +
+			'>blacklist - List users in the blacklist\n' +
 			'>channels - List channels\n' +
 			'**User commands:**\n' +
 			'>getImg - Toggle getting images from a channel\n' +
 			'**Admin commands:**\n' +
 			'>listen - Add users to the user list\n' +
 			'>unlisten - Remove users from the user list\n' +
+			'>ignore - Add users to the blacklist\n' +
+			'>unignore - Remove users from the blacklist\n' +
 			'>postImg - Toggle posting images to a channel\n' +
-			'>join - Join servers'
+			'>join - Join servers\n\n' +
+			'Visit me on github: https://github.com/robertlai/ImageCollectorBot\n' +
+			'For feature requests, open a github issue.'
 		);
 		console.log('>Posted command list.');
 	}

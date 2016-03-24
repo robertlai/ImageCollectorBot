@@ -58,7 +58,7 @@ function AdminCommands(message, bot, Data) {
 		const channelString = `${channel.name} in ${channel.server.name}`;
 		Data.outChannels = _.xorBy(Data.outChannels, [channel], 'id');
 		const addedChannel = _.map(Data.outChannels, 'id').indexOf(channel.id) !== -1;
-		console.log('>' + (addedChannel ? 'Added' : 'Removed') + 'inChannel.');
+		console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' outChannel.');
 		console.log('================================================================');
 		console.log('Channel: ' + channelString);
 		console.log('Time: ' + new Date());
@@ -80,7 +80,7 @@ function AdminCommands(message, bot, Data) {
 				message.channel,
 				'**Joined Servers.**'
 			);
-			console.log('>Joined server(s).');
+			console.log('>Joined servers.');
 		}
 		else {
 			bot.sendMessage(

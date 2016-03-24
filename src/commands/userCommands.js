@@ -8,7 +8,7 @@ function UserCommands(message, bot, Data) {
 		const channelString = `${channel.name} in ${channel.server.name}`;
 		Data.inChannels = _.xorBy(Data.inChannels, [channel], 'id');
 		const addedChannel = _.map(Data.inChannels, 'id').indexOf(channel.id) !== -1;
-		console.log('>' + (addedChannel ? 'Added' : 'Removed') + 'inChannel.');
+		console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' inChannel.');
 		console.log('================================================================');
 		console.log('Channel: ' + channelString);
 		console.log('Time: ' + new Date());

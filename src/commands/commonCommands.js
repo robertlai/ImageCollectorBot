@@ -50,10 +50,10 @@ function CommonCommands(message, bot, Data) {
 			'**User commands:**\n' +
 			'>getImg - Toggle getting images from a channel\n' +
 			'**Admin commands:**\n' +
-			'>listen - Add user(s) to the user list\n' +
-			'>unlisten - Remove user(s) from the user list\n' +
+			'>listen - Add users to the user list\n' +
+			'>unlisten - Remove users from the user list\n' +
 			'>postImg - Toggle posting images to a channel\n' +
-			'>join - Join server(s)'
+			'>join - Join servers'
 		);
 		console.log('>Posted command list.');
 	}

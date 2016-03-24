@@ -7,7 +7,7 @@ function CollectImages(message, bot, Data) {
 	});
 	const images = _.union(urls, attachments);
 	if(!_.isEmpty(images)) {
-		console.log('>Found image(s).');
+		console.log('>Found images.');
 		console.log('================================================================');
 		console.log('Server: ' + message.channel.server.name + '(' + message.channel.server.id + ')');
 		console.log('Channel: ' + message.channel.name + '(' + message.channel.id + ')');
@@ -22,7 +22,7 @@ function CollectImages(message, bot, Data) {
 				images.join('\n')
 			);
 		});
-		console.log('>Posted image(s).');
+		console.log('>Posted images.');
 	}
 }
 

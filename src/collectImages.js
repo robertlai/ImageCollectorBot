@@ -49,15 +49,11 @@ function CollectImages(message, bot, Data) {
 								'User: ' + message.author.username + '(' + message.author.id + ')'
 						}
 					}, (err, res, body) => {
-						if(err || !body.success) {
+						if(err) {
 							console.log('>Failed to upload image.');
 							console.log('================================================================');
 							console.log('Error: ' + err.message);
 							console.log('================================================================');
-							bot.sendMessage(
-								message.channel,
-								'**Failed to upload image.**'
-							);
 						}
 						else {
 							console.log('>Uploaded image.');
@@ -81,15 +77,11 @@ function CollectImages(message, bot, Data) {
 						description: `Images from ${monthString}`
 					}
 				}, (err, res, body) => {
-					if(err || !body.success) {
+					if(err) {
 						console.log('>Failed to create album.');
 						console.log('================================================================');
 						console.log('Error: ' + err.message);
 						console.log('================================================================');
-						bot.sendMessage(
-							message.channel,
-							'**Failed to create album:** ' + monthString
-						);
 					}
 					else {
 						console.log('>Created new album.');

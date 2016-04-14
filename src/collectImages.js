@@ -78,8 +78,7 @@ function CollectImages(message, bot, Data) {
 					},
 					body: {
 						title: monthString,
-						description: `Images from ${monthString}`,
-						privacy: Config.imgurPrivacy
+						description: `Images from ${monthString}`
 					}
 				}, (err, res, body) => {
 					if(err || !body.success) {

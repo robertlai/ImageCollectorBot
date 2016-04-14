@@ -1,5 +1,7 @@
 module.exports = {
     email: 'username@email.com',
     password: 'password',
-    owner: '1234567890'
+    owner: '1234567890',
+    imgurUrl: 'https://api.imgur.com/3/',
+    imgurId: '1q2w3e4r5t6y'
 };

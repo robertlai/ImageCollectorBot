@@ -49,6 +49,35 @@ function CommonCommands(message, bot, Data) {
 		);
 		console.log('>Posted channel list.');
 	}
+	else if(/^>albums$/.test(message.content)) {
+		console.log('>Received albums command.');
+		const albumList = _.map(Data.albums, (album, title) => {
+			return `- ${title}: https://imgur.com/a/${album.id}`;
+		});
+		bot.sendMessage(
+			message.channel,
+			'**Albums:**\n' + albumList.join('\n')
+		);
+		console.log('>Posted album list.');
+	}
+	else if(/^>getZip\s/.test(message.content)) {
+		console.log('>Received getZip command.');
+		const album = message.content.split(' ')[1];
+		if(album && Data.albums[album]) {
+			bot.sendMessage(
+				message.channel,
+				`${album}: https://s.imgur.com/a/${Data.albums[album].id}/zip`
+			);
+			console.log('>Posted album zip link.');
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**The album you specified does not exist.**'
+			);
+			console.log('>Invalid album.');
+		}
+	}
 	else if(/^>help$/.test(message.content)) {
 		console.log('>Received help command.');
 		bot.sendMessage(
@@ -59,6 +88,8 @@ function CommonCommands(message, bot, Data) {
 			'>admin - List users in admin list\n' +
 			'>blacklist - List users in the blacklist\n' +
 			'>channels - List channels\n' +
+			'>albums - List albums\n' +
+			'>getZip - Link a zipped album\n' +
 			'**User commands:**\n' +
 			'>getImg - Toggle getting images from a channel\n' +
 			'**Admin commands:**\n' +

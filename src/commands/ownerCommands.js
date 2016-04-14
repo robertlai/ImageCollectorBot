@@ -60,6 +60,20 @@ function OwnerCommands(message, bot, Data) {
 			console.log('>Invalid parameters.');
 		}
 	}
+	else if(/^>upload$/.test(message.content)) {
+		console.log('>Received upload command.');
+		Data.upload = !Data.upload;
+		console.log('>Toggled upload.');
+		console.log('================================================================');
+		console.log('Upload: ' + Data.upload);
+		console.log('Time: ' + new Date());
+		console.log('================================================================');
+		Data.writeData();
+		bot.sendMessage(
+			message.channel,
+			`**${Data.upload ? 'U' : 'No longer u'}ploading images to imgur.**`
+		);
+	}
 }
 
 export default OwnerCommands;

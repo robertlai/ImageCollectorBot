@@ -8,6 +8,9 @@ var Data = {
 	users: [],
 	admin: [],
 	blacklist: [],
+	currentMonth: '',
+	upload: false,
+	albums: {},
 	loadData() {
 		console.log('>Loading data...');
 		try {

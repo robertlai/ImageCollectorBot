@@ -60,7 +60,7 @@ function CommonCommands(message, bot, Data) {
 		);
 		console.log('>Posted album list.');
 	}
-	else if(/^>getZip\s/.test(message.content)) {
+	else if(/^>getZip/.test(message.content)) {
 		console.log('>Received getZip command.');
 		const album = message.content.split(' ')[1];
 		if(album && Data.albums[album]) {
@@ -73,9 +73,9 @@ function CommonCommands(message, bot, Data) {
 		else {
 			bot.sendMessage(
 				message.channel,
-				'**The album you specified does not exist.**'
+				'**Invalid parameters.**'
 			);
-			console.log('>Invalid album.');
+			console.log('>Invalid parameters.');
 		}
 	}
 	else if(/^>help$/.test(message.content)) {

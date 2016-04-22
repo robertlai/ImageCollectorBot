@@ -52,7 +52,7 @@ function CommonCommands(message, bot, Data) {
 	else if(/^>albums$/.test(message.content)) {
 		console.log('>Received albums command.');
 		const albumList = _.map(Data.albums, (album, title) => {
-			return `- ${title}: https://imgur.com/a/${album.id}`;
+			return `- ${title}: https://imgur.com/a/${album.id} (${album.imgCount} images)`;
 		});
 		bot.sendMessage(
 			message.channel,
@@ -78,6 +78,41 @@ function CommonCommands(message, bot, Data) {
 			console.log('>Invalid parameters.');
 		}
 	}
+	else if(/^>announce/.test(message.content)) {
+		console.log('>Received announce command.');
+		if(message.author.id === message.channel.server.ownerID) {
+			var channel = _.pick(message.channel, ['id', 'name', 'server']);
+			channel.server = _.pick(channel.server, ['id', 'name']);
+			const channelString = `${channel.name} in ${channel.server.name}`;
+			Data.announceChannels = _.xorBy(Data.announceChannels, [channel], 'id');
+			const addedChannel = _.map(Data.announceChannels, 'id').indexOf(channel.id) !== -1;
+			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' announceChannel.');
+			console.log('================================================================');
+			console.log('Channel: ' + channelString);
+			console.log('Time: ' + new Date());
+			console.log('================================================================');
+			Data.writeData();
+			bot.sendMessage(
+				message.channel,
+				`**${addedChannel ? 'P' : 'No longer p'}osting announcements in:** ${channelString}.`
+			);
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**This command can only be used by the server owner.**'
+			);
+			console.log('>Unauthorized.');
+		}
+	}
+	else if(/^>count/.test(message.content)) {
+		console.log('>Received count command.');
+		bot.sendMessage(
+			message.channel,
+			`**Album ${Data.currentMonth} now contains ${Data.albums[Data.currentMonth].imgCount} images!**`
+		);
+		console.log('>Posted image count.');
+	}
 	else if(/^>help$/.test(message.content)) {
 		console.log('>Received help command.');
 		bot.sendMessage(
@@ -90,6 +125,8 @@ function CommonCommands(message, bot, Data) {
 			'>channels - List channels\n' +
 			'>albums - List albums\n' +
 			'>getZip - Link a zipped album\n' +
+			'>announce - Toggle posting announcements in a channel\n' +
+			'>count - Post the image count of the current album\n' +
 			'**User commands:**\n' +
 			'>getImg - Toggle getting images from a channel\n' +
 			'**Admin commands:**\n' +

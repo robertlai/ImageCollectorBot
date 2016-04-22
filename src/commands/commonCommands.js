@@ -42,10 +42,14 @@ function CommonCommands(message, bot, Data) {
 		const outChannelList = _.map(Data.outChannels, (channel) => {
 			return `- ${channel.name} in ${channel.server.name}`;
 		});
+		const announceChannelList = _.map(Data.announceChannels, (channel) => {
+			return `- ${channel.name} in ${channel.server.name}`;
+		});
 		bot.sendMessage(
 			message.channel,
 			'**Getting images from:**\n' + inChannelList.join('\n') +
-			'\n**Posting images to:**\n' + outChannelList.join('\n')
+			'\n**Posting images to:**\n' + outChannelList.join('\n') +
+			'\n**Posting announcements in:**\n' + announceChannelList.join('\n')
 		);
 		console.log('>Posted channel list.');
 	}

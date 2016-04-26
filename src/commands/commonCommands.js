@@ -34,6 +34,33 @@ function CommonCommands(message, bot, Data) {
 		);
 		console.log('>Posted blacklist.');
 	}
+	else if(/^>postImg$/.test(message.content)) {
+		console.log('>Received postImg command.');
+		if(message.author.id === message.channel.server.ownerID) {
+			let channel = _.pick(message.channel, ['id', 'name', 'server']);
+			channel.server = _.pick(channel.server, ['id', 'name']);
+			const channelString = `${channel.name} in ${channel.server.name}`;
+			Data.outChannels = _.xorBy(Data.outChannels, [channel], 'id');
+			const addedChannel = _.map(Data.outChannels, 'id').indexOf(channel.id) !== -1;
+			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' outChannel.');
+			console.log('================================================================');
+			console.log('Channel: ' + channelString);
+			console.log('Time: ' + new Date());
+			console.log('================================================================');
+			Data.writeData();
+			bot.sendMessage(
+				message.channel,
+				`**${addedChannel ? 'P' : 'No longer p'}osting images to:** ${channelString}.`
+			);
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**This command can only be used by the server owner.**'
+			);
+			console.log('>Unauthorized.');
+		}
+	}
 	else if(/^>channels$/.test(message.content)) {
 		console.log('>Received channels command.');
 		const inChannelList = _.map(Data.inChannels, (channel) => {
@@ -85,7 +112,7 @@ function CommonCommands(message, bot, Data) {
 	else if(/^>announce/.test(message.content)) {
 		console.log('>Received announce command.');
 		if(message.author.id === message.channel.server.ownerID) {
-			var channel = _.pick(message.channel, ['id', 'name', 'server']);
+			let channel = _.pick(message.channel, ['id', 'name', 'server']);
 			channel.server = _.pick(channel.server, ['id', 'name']);
 			const channelString = `${channel.name} in ${channel.server.name}`;
 			Data.announceChannels = _.xorBy(Data.announceChannels, [channel], 'id');
@@ -126,6 +153,7 @@ function CommonCommands(message, bot, Data) {
 			'>users - List users in user list\n' +
 			'>admin - List users in admin list\n' +
 			'>blacklist - List users in the blacklist\n' +
+			'>postImg - Toggle posting images to a channel\n' +
 			'>channels - List channels\n' +
 			'>albums - List albums\n' +
 			'>getZip - Link a zipped album\n' +
@@ -138,7 +166,6 @@ function CommonCommands(message, bot, Data) {
 			'>unlisten - Remove users from the user list\n' +
 			'>ignore - Add users to the blacklist\n' +
 			'>unignore - Remove users from the blacklist\n' +
-			'>postImg - Toggle posting images to a channel\n' +
 			'>join - Join servers\n\n' +
 			'Visit me on github: https://github.com/robertlai/ImageCollectorBot\n' +
 			'For feature requests, open a github issue.'

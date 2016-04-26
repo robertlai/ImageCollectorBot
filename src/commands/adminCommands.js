@@ -101,24 +101,6 @@ function AdminCommands(message, bot, Data) {
 			console.log('>Invalid parameters.');
 		}
 	}
-	else if(/^>postImg$/.test(message.content)) {
-		console.log('>Received postImg command.');
-		var channel = _.pick(message.channel, ['id', 'name', 'server']);
-		channel.server = _.pick(channel.server, ['id', 'name']);
-		const channelString = `${channel.name} in ${channel.server.name}`;
-		Data.outChannels = _.xorBy(Data.outChannels, [channel], 'id');
-		const addedChannel = _.map(Data.outChannels, 'id').indexOf(channel.id) !== -1;
-		console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' outChannel.');
-		console.log('================================================================');
-		console.log('Channel: ' + channelString);
-		console.log('Time: ' + new Date());
-		console.log('================================================================');
-		Data.writeData();
-		bot.sendMessage(
-			message.channel,
-			`**${addedChannel ? 'P' : 'No longer p'}osting images to:** ${channelString}.`
-		);
-	}
 	else if(/^>join/.test(message.content)) {
 		console.log('>Received join command.');
 		if(/^>join(\s*https?:\/\/discord\.gg\/[A-Za-z0-9]+\s*)+$/.test(message.content)) {

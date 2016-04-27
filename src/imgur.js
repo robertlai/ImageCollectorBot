@@ -37,7 +37,7 @@ function imgur(message, bot, Data, images) {
 					console.log('>Uploaded image.');
 					console.log('>Count: ' + imgCount);
 
-					if(imgCount % 1000 === 0) {
+					if(imgCount % Data.interval === 0) {
 						_.forEach(Data.announceChannels, (announceChannel) => {
 							bot.sendMessage(
 								announceChannel.id,

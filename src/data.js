@@ -11,6 +11,7 @@ var Data = {
 	currentMonth: '',
 	upload: false,
 	albums: {},
+	interval: 1000,
 	loadData() {
 		console.log('>Loading data...');
 		try {

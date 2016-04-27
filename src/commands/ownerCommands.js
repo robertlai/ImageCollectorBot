@@ -74,6 +74,30 @@ function OwnerCommands(message, bot, Data) {
 			`**${Data.upload ? 'U' : 'No longer u'}ploading images to imgur.**`
 		);
 	}
+	else if(/^>interval/.test(message.content)) {
+		console.log('>Received interval command.');
+		const interval = message.content.split(' ')[1];
+		if(interval && _.isNumber(parseInt(interval))) {
+			Data.interval = parseInt(interval);
+			console.log('>Set announcement interval.');
+			console.log('================================================================');
+			console.log('Interval: ' + Data.interval);
+			console.log('Time: ' + new Date());
+			console.log('================================================================');
+			Data.writeData();
+			bot.sendMessage(
+				message.channel,
+				`**Set announcement interval to: ${interval}**`
+			);
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**Invalid parameters.**'
+			);
+			console.log('>Invalid parameters.');
+		}
+	}
 }
 
 export default OwnerCommands;

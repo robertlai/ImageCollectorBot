@@ -1,7 +1,11 @@
 import _ from 'lodash';
 
+const regex = {
+	getImg: /^>getImg$/
+};
+
 function UserCommands(message, bot, Data) {
-	if(/^>getImg$/.test(message.content)) {
+	if(regex.getImg.test(message.content)) {
 		console.log('>Received getImg command.');
 		var channel = _.pick(message.channel, ['id', 'name', 'server']);
 		channel.server = _.pick(channel.server, ['id', 'name']);

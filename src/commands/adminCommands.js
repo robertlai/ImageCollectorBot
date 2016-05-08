@@ -1,60 +1,21 @@
 import _ from 'lodash';
+import { getUsers } from '../utils';
+
+const regex = {
+	listen: /^>listen/,
+	unlisten: /^>unlisten/,
+	ignore: /^>ignore/,
+	unignore: /^>unignore/,
+	join: /^>join/,
+	join2: /^>join(\s*https?:\/\/discord\.gg\/[A-Za-z0-9]+\s*)+$/,
+	invite: /https?:\/\/discord\.gg\/[A-Za-z0-9]+/gi
+};
 
 function AdminCommands(message, bot, Data) {
-	if(/^>listen/.test(message.content)) {
-		console.log('>Received listen command.');
-		if(/^>listen(\s*<@\d+>\s*)+$/.test(message.content)){
-			const users = _.map(message.mentions, (user) => _.pick(user, ['id', 'username']));
-			const usersString = _.map(users, 'username').join(', ');
-			Data.users = _.unionBy(Data.users, users, 'id');
-			console.log('>Added users.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Added users:** ' + usersString
-			);
-		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
-		}
-	}
-	else if(/^>unlisten/.test(message.content)) {
-		console.log('>Received unlisten command.');
-		if(/^>unlisten(\s*<@\d+>\s*)+$/.test(message.content)){
-			const users = _.map(message.mentions, (user) => _.pick(user, ['id', 'username']));
-			const usersString = _.map(users, 'username').join(', ');
-			Data.users = _.differenceBy(Data.users, users, 'id');
-			console.log('>Removed users.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Removed users:** ' + usersString
-			);
-		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
-		}
-	}
-	else if(/^>ignore/.test(message.content)) {
+	if(regex.ignore.test(message.content)) {
 		console.log('>Received ignore command.');
-		if(/^>ignore(\s*<@\d+>\s*)+$/.test(message.content)){
-			const users = _.map(message.mentions, (user) => _.pick(user, ['id', 'username']));
+		const users = getUsers(message);
+		if(users) {
 			const usersString = _.map(users, 'username').join(', ');
 			Data.blacklist = _.unionBy(Data.blacklist, users, 'id');
 			console.log('>Ignored users.');
@@ -76,10 +37,10 @@ function AdminCommands(message, bot, Data) {
 			console.log('>Invalid parameters.');
 		}
 	}
-	else if(/^>unignore/.test(message.content)) {
+	else if(regex.unignore.test(message.content)) {
 		console.log('>Received unignore command.');
-		if(/^>unignore(\s*<@\d+>\s*)+$/.test(message.content)){
-			const users = _.map(message.mentions, (user) => _.pick(user, ['id', 'username']));
+		const users = getUsers(message);
+		if(users) {
 			const usersString = _.map(users, 'username').join(', ');
 			Data.blacklist = _.differenceBy(Data.blacklist, users, 'id');
 			console.log('>Unignored users.');
@@ -101,10 +62,10 @@ function AdminCommands(message, bot, Data) {
 			console.log('>Invalid parameters.');
 		}
 	}
-	else if(/^>join/.test(message.content)) {
+	else if(regex.join.test(message.content)) {
 		console.log('>Received join command.');
-		if(/^>join(\s*https?:\/\/discord\.gg\/[A-Za-z0-9]+\s*)+$/.test(message.content)) {
-			const invites = message.content.match(/https?:\/\/discord\.gg\/[A-Za-z0-9]+/gi);
+		if(regex.join2.test(message.content)) {
+			const invites = message.content.match(regex.invite);
 			_.forEach(invites, (invite) => {
 				bot.joinServer(invite);
 			});
@@ -113,6 +74,56 @@ function AdminCommands(message, bot, Data) {
 				'**Joined Servers.**'
 			);
 			console.log('>Joined servers.');
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**Invalid parameters.**'
+			);
+			console.log('>Invalid parameters.');
+		}
+	}
+	else if(regex.listen.test(message.content)) {
+		console.log('>Received listen command.');
+		const users = getUsers(message);
+		if(users) {
+			const usersString = _.map(users, 'username').join(', ');
+			Data.users = _.unionBy(Data.users, users, 'id');
+			console.log('>Added users.');
+			console.log('================================================================');
+			console.log('Users: ' + usersString);
+			console.log('Time: ' + new Date());
+			console.log('================================================================');
+			Data.writeData();
+			bot.sendMessage(
+				message.channel,
+				'**Added users:** ' + usersString
+			);
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**Invalid parameters.**'
+			);
+			console.log('>Invalid parameters.');
+		}
+	}
+	else if(regex.unlisten.test(message.content)) {
+		console.log('>Received unlisten command.');
+		const users = getUsers(message);
+		if(users) {
+			const usersString = _.map(users, 'username').join(', ');
+			Data.users = _.differenceBy(Data.users, users, 'id');
+			console.log('>Removed users.');
+			console.log('================================================================');
+			console.log('Users: ' + usersString);
+			console.log('Time: ' + new Date());
+			console.log('================================================================');
+			Data.writeData();
+			bot.sendMessage(
+				message.channel,
+				'**Removed users:** ' + usersString
+			);
 		}
 		else {
 			bot.sendMessage(

@@ -1,7 +1,16 @@
 import _ from 'lodash';
+import { getUsers } from '../utils';
+
+const regex = {
+	reload: /^>reload$/,
+	addAdmin: /^>addAdmin/,
+	removeAdmin: /^>removeAdmin/,
+	upload: /^>upload$/,
+	interval: /^>interval/
+};
 
 function OwnerCommands(message, bot, Data) {
-	if(/^>reload$/.test(message.content)) {
+	if(regex.reload.test(message.content)) {
 		console.log('>Received reload command.');
 		Data.loadData();
 		bot.sendMessage(
@@ -10,10 +19,10 @@ function OwnerCommands(message, bot, Data) {
 		);
 		console.log('>Reloaded data.');
 	}
-	else if(/^>addAdmin/.test(message.content)) {
+	else if(regex.addAdmin.test(message.content)) {
 		console.log('>Received addAdmin command.');
-		if(/^>addAdmin(\s*<@\d+>\s*)+$/.test(message.content)){
-			const users = _.map(message.mentions, (user) => _.pick(user, ['id', 'username']));
+		const users = getUsers(message);
+		if(users) {
 			const usersString = _.map(users, 'username').join(', ');
 			Data.admin = _.unionBy(Data.admin, users, 'id');
 			console.log('>Added admin.');
@@ -35,10 +44,10 @@ function OwnerCommands(message, bot, Data) {
 			console.log('>Invalid parameters.');
 		}
 	}
-	else if(/^>removeAdmin/.test(message.content)) {
+	else if(regex.removeAdmin.test(message.content)) {
 		console.log('>Received removeAdmin command.');
-		if(/^>removeAdmin(\s*<@\d+>\s*)+$/.test(message.content)){
-			const users = _.map(message.mentions, (user) => _.pick(user, ['id', 'username']));
+		const users = getUsers(message);
+		if(users) {
 			const usersString = _.map(users, 'username').join(', ');
 			Data.admin = _.differenceBy(Data.admin, users, 'id');
 			console.log('>Removed admin.');
@@ -60,21 +69,7 @@ function OwnerCommands(message, bot, Data) {
 			console.log('>Invalid parameters.');
 		}
 	}
-	else if(/^>upload$/.test(message.content)) {
-		console.log('>Received upload command.');
-		Data.upload = !Data.upload;
-		console.log('>Toggled upload.');
-		console.log('================================================================');
-		console.log('Upload: ' + Data.upload);
-		console.log('Time: ' + new Date());
-		console.log('================================================================');
-		Data.writeData();
-		bot.sendMessage(
-			message.channel,
-			`**${Data.upload ? 'U' : 'No longer u'}ploading images to imgur.**`
-		);
-	}
-	else if(/^>interval/.test(message.content)) {
+	else if(regex.interval.test(message.content)) {
 		console.log('>Received interval command.');
 		const interval = message.content.split(' ')[1];
 		if(interval && _.isNumber(parseInt(interval))) {
@@ -97,6 +92,20 @@ function OwnerCommands(message, bot, Data) {
 			);
 			console.log('>Invalid parameters.');
 		}
+	}
+	else if(regex.upload.test(message.content)) {
+		console.log('>Received upload command.');
+		Data.upload = !Data.upload;
+		console.log('>Toggled upload.');
+		console.log('================================================================');
+		console.log('Upload: ' + Data.upload);
+		console.log('Time: ' + new Date());
+		console.log('================================================================');
+		Data.writeData();
+		bot.sendMessage(
+			message.channel,
+			`**${Data.upload ? 'U' : 'No longer u'}ploading images to imgur.**`
+		);
 	}
 }
 

@@ -1,10 +1,15 @@
 import _ from 'lodash';
 import imgur from './imgur';
 
+const regex = {
+	image_url: /(https?:\/\/.*\.(?:png|jpg|gif))/gi,
+	image_attach: /(https?:\/\/.*\.(?:png|jpg|gif))/i
+};
+
 function CollectImages(message, bot, Data) {
-	const urls = message.content.match(/(https?:\/\/.*\.(?:png|jpg|gif))/gi);
+	const urls = message.content.match(regex.image_url);
 	const attachments = _.filter(_.map(message.attachments, 'url'), (attachment) => {
-		return /(https?:\/\/.*\.(?:png|jpg|gif))/i.test(attachment);
+		return regex.image_attach.test(attachment);
 	});
 	const images = _.union(urls, attachments);
 	if(!_.isEmpty(images)) {

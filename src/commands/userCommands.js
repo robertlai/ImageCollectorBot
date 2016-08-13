@@ -3,35 +3,11 @@ import imgur from '../imgur';
 
 const regex = {
 	getImg: /^>getImg$/,
-	delete: /^>delete/,
-	leaderboard: /^>leaderboard$/
+	delete: /^>delete/
 };
 
 function UserCommands(message, bot, Data) {
-	if(regex.leaderboard.test(message.content)) {
-		console.log('>Received leaderboard command.');
-		const leaders = _(Data.scores)
-			.map((score, id) => {
-				return {
-					id: id,
-					score: score
-				};
-			})
-			.sortBy((user) => {
-				return user.score * -1;
-			})
-			.slice(0, 10)
-			.value();
-		bot.sendMessage(
-			message.channel,
-			'**Current standings for ' + Data.currentMonth + ':**\n' +
-			_.map(leaders, (user, i) => {
-				return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
-			}).join('\n')
-		);
-		console.log('>Posted leaderboard.');
-	}
-	else if(regex.getImg.test(message.content)) {
+	if(regex.getImg.test(message.content)) {
 		console.log('>Received getImg command.');
 		var channel = _.pick(message.channel, ['id', 'name', 'server']);
 		channel.server = _.pick(channel.server, ['id', 'name']);

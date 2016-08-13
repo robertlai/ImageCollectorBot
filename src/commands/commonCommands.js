@@ -9,7 +9,8 @@ const regex = {
 	albums: /^>albums$/,
 	announce: /^>announce$/,
 	count: /^>count$/,
-	help: /^>help$/
+	help: /^>help$/,
+	leaderboard: /^>leaderboard$/
 };
 
 function CommonCommands(message, bot, Data) {
@@ -27,6 +28,7 @@ function CommonCommands(message, bot, Data) {
 			'>channels - List channels\n' +
 			'>albums - List albums\n' +
 			'>count - Post the image count of the current album\n' +
+			'>leaderboard - Post the current monthly leaderboard\n' +
 			'**User commands:**\n' +
 			'>getImg - Toggle getting images from a channel\n' +
 			'>delete - Remove an image from an album on imgur\n' +
@@ -40,6 +42,29 @@ function CommonCommands(message, bot, Data) {
 			'For feature requests, open a github issue.'
 		);
 		console.log('>Posted command list.');
+	}
+	else if(regex.leaderboard.test(message.content)) {
+		console.log('>Received leaderboard command.');
+		const leaders = _(Data.scores)
+			.map((score, id) => {
+				return {
+					id: id,
+					score: score
+				};
+			})
+			.sortBy((user) => {
+				return user.score * -1;
+			})
+			.slice(0, 10)
+			.value();
+		bot.sendMessage(
+			message.channel,
+			'**Current standings for ' + Data.currentMonth + ':**\n' +
+			_.map(leaders, (user, i) => {
+				return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
+			}).join('\n')
+		);
+		console.log('>Posted leaderboard.');
 	}
 	else if(regex.albums.test(message.content)) {
 		console.log('>Received albums command.');

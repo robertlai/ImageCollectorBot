@@ -2,7 +2,7 @@ import _ from 'lodash';
 import imgur from './imgur';
 
 const regex = {
-	image_url: /(https?:\/\/.*\.(?:png|jpg|gif))/gi,
+	image_url: /(https?:\/\/.*\.(?:png|jpg|gif))(\s|$)/gi,
 	image_attach: /(https?:\/\/.*\.(?:png|jpg|gif))/i
 };
 

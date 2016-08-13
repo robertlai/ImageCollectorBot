@@ -29,6 +29,7 @@ function CommonCommands(message, bot, Data) {
 			'>count - Post the image count of the current album\n' +
 			'**User commands:**\n' +
 			'>getImg - Toggle getting images from a channel\n' +
+			'>delete - Remove an image from an album on imgur\n' +
 			'**Admin commands:**\n' +
 			'>listen - Add users to the user list\n' +
 			'>unlisten - Remove users from the user list\n' +

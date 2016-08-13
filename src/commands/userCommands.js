@@ -1,11 +1,20 @@
 import _ from 'lodash';
+import imgur from '../imgur';
 
 const regex = {
-	getImg: /^>getImg$/
+	getImg: /^>getImg$/,
+	delete: /^>delete/
 };
 
 function UserCommands(message, bot, Data) {
-	if(regex.getImg.test(message.content)) {
+	if(regex.delete.test(message.content)) {
+		console.log('>Received delete command.');
+		const tokens = message.content.split(' ');
+		imgur.delete(message, bot, Data, tokens[1], _.map(tokens.slice(2), (id) => {
+			return id.replace(/[^a-z0-9]/gi, '');
+		}));
+	}
+	else if(regex.getImg.test(message.content)) {
 		console.log('>Received getImg command.');
 		var channel = _.pick(message.channel, ['id', 'name', 'server']);
 		channel.server = _.pick(channel.server, ['id', 'name']);

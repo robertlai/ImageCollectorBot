@@ -31,7 +31,7 @@ function CollectImages(message, bot, Data) {
 		console.log('>Posted images.');
 
 		if(Data.upload) {
-			imgur(message, bot, Data, images);
+			imgur.upload(message, bot, Data, images);
 		}
 	}
 }

@@ -12,6 +12,7 @@ var Data = {
 	upload: false,
 	albums: {},
 	interval: 1000,
+	scores: {},
 	loadData() {
 		console.log('>Loading data...');
 		try {

@@ -30,8 +30,51 @@ function CollectImages(message, bot, Data) {
 		});
 		console.log('>Posted images.');
 
+		const date = new Date();
+		const monthString = `${date.getFullYear()}/${('0' + (date.getMonth() + 1)).slice(-2)}`;
+		if(monthString !== Data.currentMonth) {
+			const leaders = _(Data.scores)
+				.map((score, id) => {
+					return {
+						id: id,
+						score: score
+					};
+				})
+				.sortBy((user) => {
+					return user.score * -1;
+				})
+				.slice(0, 10)
+				.value();
+
+			_.forEach(Data.announceChannels, (announceChannel) => {
+				bot.sendMessage(
+					announceChannel.id,
+					'**Final standings for ' + Data.currentMonth + ':**\n' +
+					_.map(leaders, (user, i) => {
+						return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
+					}).join('\n')
+				);
+			});
+			console.log('>Posted announcements.');
+
+			Data.scores = {};
+
+			imgur.createAlbum(Data, monthString);
+			Data.currentMonth = monthString;
+			Data.writeData();
+		}
+
 		if(Data.upload) {
 			imgur.upload(message, bot, Data, images);
+		}
+
+		if(Data.scores[message.author.id]) {
+			Data.scores[message.author.id] += images.length;
+			Data.writeData();
+		}
+		else {
+			Data.scores[message.author.id] = images.length;
+			Data.writeData();
 		}
 	}
 }

@@ -45,26 +45,34 @@ function CommonCommands(message, bot, Data) {
 	}
 	else if(regex.leaderboard.test(message.content)) {
 		console.log('>Received leaderboard command.');
-		const leaders = _(Data.scores)
-			.map((score, id) => {
-				return {
-					id: id,
-					score: score
-				};
-			})
-			.sortBy((user) => {
-				return user.score * -1;
-			})
-			.slice(0, 10)
-			.value();
-		bot.sendMessage(
-			message.channel,
-			'**Current standings for ' + Data.currentMonth + ':**\n' +
-			_.map(leaders, (user, i) => {
-				return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
-			}).join('\n')
-		);
-		console.log('>Posted leaderboard.');
+		if(Data.trackScores) {
+			const leaders = _(Data.scores)
+				.map((score, id) => {
+					return {
+						id: id,
+						score: score
+					};
+				})
+				.sortBy((user) => {
+					return user.score * -1;
+				})
+				.slice(0, 10)
+				.value();
+			bot.sendMessage(
+				message.channel,
+				'**Current standings for ' + Data.currentMonth + ':**\n' +
+				_.map(leaders, (user, i) => {
+					return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
+				}).join('\n')
+			);
+			console.log('>Posted leaderboard.');
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**Score tracking is not active.**'
+			);
+		}
 	}
 	else if(regex.albums.test(message.content)) {
 		console.log('>Received albums command.');

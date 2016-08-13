@@ -33,31 +33,33 @@ function CollectImages(message, bot, Data) {
 		const date = new Date();
 		const monthString = `${date.getFullYear()}/${('0' + (date.getMonth() + 1)).slice(-2)}`;
 		if(monthString !== Data.currentMonth) {
-			const leaders = _(Data.scores)
-				.map((score, id) => {
-					return {
-						id: id,
-						score: score
-					};
-				})
-				.sortBy((user) => {
-					return user.score * -1;
-				})
-				.slice(0, 10)
-				.value();
+			if(Data.trackScores) {
+				const leaders = _(Data.scores)
+					.map((score, id) => {
+						return {
+							id: id,
+							score: score
+						};
+					})
+					.sortBy((user) => {
+						return user.score * -1;
+					})
+					.slice(0, 10)
+					.value();
 
-			_.forEach(Data.announceChannels, (announceChannel) => {
-				bot.sendMessage(
-					announceChannel.id,
-					'**Final standings for ' + Data.currentMonth + ':**\n' +
-					_.map(leaders, (user, i) => {
-						return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
-					}).join('\n')
-				);
-			});
-			console.log('>Posted announcements.');
+				_.forEach(Data.announceChannels, (announceChannel) => {
+					bot.sendMessage(
+						announceChannel.id,
+						'**Final standings for ' + Data.currentMonth + ':**\n' +
+						_.map(leaders, (user, i) => {
+							return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
+						}).join('\n')
+					);
+				});
+				console.log('>Posted announcements.');
 
-			Data.scores = {};
+				Data.scores = {};
+			}
 
 			imgur.createAlbum(Data, monthString);
 			Data.currentMonth = monthString;
@@ -68,13 +70,15 @@ function CollectImages(message, bot, Data) {
 			imgur.upload(message, bot, Data, images);
 		}
 
-		if(Data.scores[message.author.id]) {
-			Data.scores[message.author.id] += images.length;
-			Data.writeData();
-		}
-		else {
-			Data.scores[message.author.id] = images.length;
-			Data.writeData();
+		if(Data.trackScores) {
+			if(Data.scores[message.author.id]) {
+				Data.scores[message.author.id] += images.length;
+				Data.writeData();
+			}
+			else {
+				Data.scores[message.author.id] = images.length;
+				Data.writeData();
+			}
 		}
 	}
 }

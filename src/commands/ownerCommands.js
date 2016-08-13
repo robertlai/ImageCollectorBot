@@ -6,7 +6,8 @@ const regex = {
 	addAdmin: /^>addAdmin/,
 	removeAdmin: /^>removeAdmin/,
 	upload: /^>upload$/,
-	interval: /^>interval/
+	interval: /^>interval/,
+	trackScores: /^>trackScores$/
 };
 
 function OwnerCommands(message, bot, Data) {
@@ -105,6 +106,20 @@ function OwnerCommands(message, bot, Data) {
 		bot.sendMessage(
 			message.channel,
 			`**${Data.upload ? 'U' : 'No longer u'}ploading images to imgur.**`
+		);
+	}
+	else if(regex.trackScores.test(message.content)) {
+		console.log('>Received trackScores command.');
+		Data.trackScores = !Data.trackScores;
+		console.log('>Toggled score tracking.');
+		console.log('================================================================');
+		console.log('Tracking: ' + Data.trackScores);
+		console.log('Time: ' + new Date());
+		console.log('================================================================');
+		Data.writeData();
+		bot.sendMessage(
+			message.channel,
+			`**${Data.trackScores ? 'T' : 'No longer t'}racking scores.**`
 		);
 	}
 }

@@ -26,7 +26,7 @@ bot.on('ready', () => {
 });
 
 bot.on('message', (message) => {
-	if(message.author.id === bot.internal.user.id) {
+	if(message.author.id === bot.internal.user.id || bot.users.get('id', message.author.id).bot) {
 		return;
 	}
 	if(message.author.id === Config.owner) {

@@ -62,8 +62,6 @@ function CollectImages(message, bot, Data) {
 			}
 
 			imgur.createAlbum(Data, monthString);
-			Data.currentMonth = monthString;
-			Data.writeData();
 		}
 
 		if(Data.upload) {

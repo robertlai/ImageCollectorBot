@@ -35,6 +35,8 @@ const imgur = {
 					deleteHash: body.data.deletehash,
 					imgCount: 0
 				};
+				Data.currentMonth = title;
+				Data.writeData();
 			}
 		});
 	},

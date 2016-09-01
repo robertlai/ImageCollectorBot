@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 const DATA_FILE_NAME = './data.json';
+const BACKUP_FILE_NAME = './data.bak';
 
 var Data = {
 	inChannels: [],
@@ -22,6 +23,8 @@ var Data = {
 				this[i] = data[i];
 			}
 			console.log('>Successfully loaded data.');
+			fs.writeFile(BACKUP_FILE_NAME, JSON.stringify(this));
+			console.log('>Wrote backup file.');
 		}
 		catch(err) {
 			console.log('>An error occurred.');
@@ -34,6 +37,9 @@ var Data = {
 		console.log('>Writing data...');
 		try {
 			const data = JSON.stringify(this);
+			if(!data) {
+				throw new Error('No data found.');
+			}
 			fs.writeFile(DATA_FILE_NAME, data);
 			console.log('>Successfully wrote data.');
 		}

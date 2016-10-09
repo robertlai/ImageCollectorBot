@@ -58,7 +58,7 @@ const imgur = {
 						'Channel: ' + message.channel.name + '\n' +
 						'User: ' + message.author.username + '(' + message.author.id + ')'
 				}
-			}, (err) => {
+			}, (err, res) => {
 				if(err) {
 					console.log('>Failed to upload image.');
 					console.log('================================================================');
@@ -66,6 +66,12 @@ const imgur = {
 					console.log('================================================================');
 				}
 				else {
+					if(res.statusCode !== 200) {
+						console.log('>Failed to upload image.');
+						console.log('================================================================');
+						console.log('Error: ' + res.statusMessage);
+						console.log('================================================================');
+					}
 					const imgCount = ++Data.albums[Data.currentMonth].imgCount;
 					Data.writeData();
 					console.log('>Uploaded image.');

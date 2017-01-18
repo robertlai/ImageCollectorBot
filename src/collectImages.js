@@ -22,9 +22,9 @@ function CollectImages(message, bot, Data) {
 		_.forEach(Data.outChannels, (outChannel) => {
 			bot.sendMessage(
 				outChannel.id,
-				'**Server:** ' + message.channel.server.name + '\n' +
-				'**Channel:** ' + message.channel.name + '\n' +
-				'**User:** ' + message.author.username + '(' + message.author.id + ')\n' +
+				'**Server:** `' + message.channel.server.name + '`\n' +
+				'**Channel:** `' + message.channel.name + '`\n' +
+				'**User:** `' + message.author.username + '(' + message.author.id + ')`\n' +
 				images.join('\n')
 			);
 		});

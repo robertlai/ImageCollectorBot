@@ -1,127 +1,55 @@
-import _ from 'lodash';
-import { getUsers } from '../utils';
+import Data from '../data'
+import Logger from '../logger'
 
-const regex = {
-	reload: /^>reload$/,
-	addAdmin: /^>addAdmin/,
-	removeAdmin: /^>removeAdmin/,
-	upload: /^>upload$/,
-	interval: /^>interval/,
-	trackScores: /^>trackScores$/
-};
-
-function OwnerCommands(message, bot, Data) {
-	if(regex.reload.test(message.content)) {
-		console.log('>Received reload command.');
-		Data.loadData();
-		bot.sendMessage(
-			message.channel,
-			'**Reloaded data.**'
-		);
-		console.log('>Reloaded data.');
-	}
-	else if(regex.addAdmin.test(message.content)) {
-		console.log('>Received addAdmin command.');
-		const users = getUsers(message);
-		if(users) {
-			const usersString = _.map(users, 'username').join(', ');
-			Data.admin = _.unionBy(Data.admin, users, 'id');
-			console.log('>Added admin.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Added administrators:** ' + usersString
-			);
+function ownerCommands(message) {
+	const tokens = message.content.split(' ')
+	if (message.content === '>reload') {
+		Logger.log('Received reload command.')
+		Data.loadData()
+		message.channel.send('**Reloaded data.**')
+		Logger.log('Reloaded data.')
+	} else if (tokens[0] === '>setInterval') {
+		Logger.log('Received setInterval command.')
+		const interval = parseInt(tokens[1])
+		const collectionKey = tokens[2] || 'Default'
+		const collection = Data.collections[collectionKey]
+		if (interval && collection) {
+			collection.interval = interval
+			Logger.log('Set announcement interval.')
+			Logger.block([
+				`Author: ${message.author.tag}(${message.author.id})`,
+				`Collection: ${collectionKey}`,
+				`Interval: ${interval}`,
+				`Time: ${new Date()}`
+			])
+			Data.writeData()
+			message.channel.send(`**Set announcement interval.**`)
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
+	} else if (tokens[0] === '>toggleFeature') {
+		Logger.log('Received toggleFeature command.')
+		const feature = tokens[1]
+		const collectionKey = tokens[2] || 'Default'
+		const collection = Data.collections[collectionKey]
+		if (feature && collection) {
+			collection.features[feature] = !collection.features[feature]
+			Logger.log('Toggled feature.')
+			Logger.block([
+				`Author: ${message.author.tag}(${message.author.id})`,
+				`Collection: ${collectionKey}`,
+				`Feature: ${feature}`,
+				`Enabled: ${collection.features[feature]}`,
+				`Time: ${new Date()}`
+			])
+			Data.writeData()
+			message.channel.send(`**Toggled feature ${collection.features[feature] ? 'on' : 'off'}**`)
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-	}
-	else if(regex.removeAdmin.test(message.content)) {
-		console.log('>Received removeAdmin command.');
-		const users = getUsers(message);
-		if(users) {
-			const usersString = _.map(users, 'username').join(', ');
-			Data.admin = _.differenceBy(Data.admin, users, 'id');
-			console.log('>Removed admin.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Removed administrators:** ' + usersString
-			);
-		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
-		}
-	}
-	else if(regex.interval.test(message.content)) {
-		console.log('>Received interval command.');
-		const interval = message.content.split(' ')[1];
-		if(interval && _.isNumber(parseInt(interval))) {
-			Data.interval = parseInt(interval);
-			console.log('>Set announcement interval.');
-			console.log('================================================================');
-			console.log('Interval: ' + Data.interval);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				`**Set announcement interval to: ${interval}**`
-			);
-		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
-		}
-	}
-	else if(regex.upload.test(message.content)) {
-		console.log('>Received upload command.');
-		Data.upload = !Data.upload;
-		console.log('>Toggled upload.');
-		console.log('================================================================');
-		console.log('Upload: ' + Data.upload);
-		console.log('Time: ' + new Date());
-		console.log('================================================================');
-		Data.writeData();
-		bot.sendMessage(
-			message.channel,
-			`**${Data.upload ? 'U' : 'No longer u'}ploading images to imgur.**`
-		);
-	}
-	else if(regex.trackScores.test(message.content)) {
-		console.log('>Received trackScores command.');
-		Data.trackScores = !Data.trackScores;
-		console.log('>Toggled score tracking.');
-		console.log('================================================================');
-		console.log('Tracking: ' + Data.trackScores);
-		console.log('Time: ' + new Date());
-		console.log('================================================================');
-		Data.writeData();
-		bot.sendMessage(
-			message.channel,
-			`**${Data.trackScores ? 'T' : 'No longer t'}racking scores.**`
-		);
 	}
 }
 
-export default OwnerCommands;
+export default ownerCommands

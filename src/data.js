@@ -7,7 +7,7 @@ const BACKUP_DIR = 'backup/';
 var writeLock = 0;
 
 const Data = {
-	defaultCollection: 'Default'
+	defaultCollection: 'Default',
 	collections: {},
 	permissions: {},
 	blacklist: {},

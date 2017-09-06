@@ -4,6 +4,7 @@ import Data from './data'
 import Logger from './logger'
 import ImageCollector from './ImageCollector'
 import Commands from './commands'
+import Tasks from './tasks'
 
 const discord = new Discord.Client()
 
@@ -15,6 +16,7 @@ discord.on('ready', () => {
     `Channel count: ${discord.channels.size}`,
     `Time: ${new Date()}`
   ])
+  Tasks.start()
   Logger.log('Listening...')
 })
 
@@ -31,3 +33,5 @@ Logger.log('Initializing...')
 Data.loadData(() => {
   discord.login(Config.token)
 })
+
+export default discord

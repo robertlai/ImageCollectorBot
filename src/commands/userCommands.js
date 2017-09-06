@@ -1,38 +1,37 @@
-import _ from 'lodash';
-import imgur from '../imgur';
+import Data from '../data'
+import Logger from '../logger'
 
-const regex = {
-	getImg: /^>getImg$/,
-	delete: /^>delete/
-};
-
-function UserCommands(message, bot, Data) {
-	if(regex.getImg.test(message.content)) {
-		console.log('>Received getImg command.');
-		var channel = _.pick(message.channel, ['id', 'name', 'server']);
-		channel.server = _.pick(channel.server, ['id', 'name']);
-		const channelString = `${channel.name} in ${channel.server.name}`;
-		Data.inChannels = _.xorBy(Data.inChannels, [channel], 'id');
-		const addedChannel = _.map(Data.inChannels, 'id').indexOf(channel.id) !== -1;
-		console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' inChannel.');
-		console.log('================================================================');
-		console.log('Channel: ' + channelString);
-		console.log('Time: ' + new Date());
-		console.log('================================================================');
-		Data.writeData();
-		bot.sendMessage(
-			message.channel,
-			`**${addedChannel ? 'G' : 'No longer g'}etting images from:** ${channelString}.`
-		);
+function userCommands(message) {
+	const tokens = message.content.split(' ')
+	if (tokens[0] === '>getImg') {
+		Logger.log('Received getImg command.')
+		const channelId = message.channel.id
+		const collectionKey = tokens[1] || 'Default'
+		const collection = Data.collections[collectionKey]
+		if (collection) {
+			collection.inChannels[channelId] = !collection.inChannels[channelId]
+			const addedChannel = collection.inChannels[channelId]
+			Logger.log(`${addedChannel ? 'Added' : 'Removed'} inChannel.`)
+			Logger.block([
+				`Author: ${message.author.tag}(${message.author.id})`,
+				`Collection: ${collectionKey}`,
+				`Channel ID: ${channelId}`,
+				`Time: ${new Date()}`
+			])
+			Data.writeData()
+			message.channel.send(`**${addedChannel ? 'G' : 'No longer g'}etting images for collection: ${collectionKey}.**`)
+		}
+	} else if (tokens[0] === '>delete') {
+		console.log('>Received delete command.')
+		const collection = Data.collections[tokens[1]]
+		if (collection) {
+			const album = collection.albums[tokens[2]]
+			if (album) {
+				const imageIds = tokens.slice[3]
+				imgur.delete(message, album, imageIds)
+			}
+		}
 	}
-	else if(regex.delete.test(message.content)) {
-		console.log('>Received delete command.');
-		const tokens = message.content.split(' ');
-		imgur.delete(message, bot, Data, tokens[1], _.map(tokens.slice(2), (id) => {
-			return id.replace(/[^a-z0-9]/gi, '');
-		}));
-	}
-
 }
 
-export default UserCommands;
+export default userCommands

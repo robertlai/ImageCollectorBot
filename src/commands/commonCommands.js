@@ -1,204 +1,168 @@
-import _ from 'lodash';
+import _ from 'lodash'
+import discord from '../main'
+import Data from '../data'
+import Logger from '../logger'
+import Docs from './docs'
 
-const regex = {
-	users: /^>users$/,
-	admin: /^>admin$/,
-	blacklist: /^>blacklist$/,
-	postImg: /^>postImg$/,
-	channels: /^>channels$/,
-	albums: /^>albums$/,
-	announce: /^>announce$/,
-	count: /^>count$/,
-	help: /^>help$/,
-	leaderboard: /^>leaderboard$/
-};
+const defaultHelp = '**Common commands:**\n' +
+	`>help - ${Docs.help.description}\n` +
+	`>users - ${Docs.users.description}\n` +
+	`>admin - ${Docs.admin.description}\n` +
+	`>blacklist - ${Docs.blacklist.description}\n` +
+	`>channels - ${Docs.channels.description}\n` +
+	`>albums - ${Docs.albums.description}\n` +
+	`>count - ${Docs.count.description}\n` +
+	`>leaderboard - ${Docs.leaderboard.description}\n` +
+	'**User commands:**\n' +
+	`>getImg - ${Docs.getImg.description}\n` +
+	`>delete - ${Docs.delete.description}\n` +
+	'**Admin commands:**\n' +
+	`>postImg - ${Docs.postImg.description}\n` +
+	`>announce - ${Docs.announce.description}\n` +
+	`>setPermission - ${Docs.setPermission.description}\n` +
+	`>ignore - ${Docs.ignore.description}\n` +
+	`>unignore - ${Docs.unignore.description}\n` +
+	`>join - ${Docs.join.description}\n` +
+	`>setInterval - ${Docs.setInterval.description}\n` +
+	'\nI am free and open-source.' +
+	'Visit me on github: https://github.com/robertlai/ImageCollectorBot'
 
-function CommonCommands(message, bot, Data) {
-	if(regex.help.test(message.content)) {
-		console.log('>Received help command.');
-		bot.sendMessage(
-			message.channel,
-			'**Common commands:**\n' +
-			'>help - List commands\n' +
-			'>users - List users in user list\n' +
-			'>admin - List users in admin list\n' +
-			'>blacklist - List users in the blacklist\n' +
-			'>postImg - Toggle posting images to a channel\n' +
-			'>announce - Toggle posting announcements in a channel\n' +
-			'>channels - List channels\n' +
-			'>albums - List albums\n' +
-			'>count - Post the image count of the current album\n' +
-			'>leaderboard - Post the current monthly leaderboard\n' +
-			'**User commands:**\n' +
-			'>getImg - Toggle getting images from a channel\n' +
-			'>delete - Remove an image from an album on imgur\n' +
-			'**Admin commands:**\n' +
-			'>listen - Add users to the user list\n' +
-			'>unlisten - Remove users from the user list\n' +
-			'>ignore - Add users to the blacklist\n' +
-			'>unignore - Remove users from the blacklist\n' +
-			'>join - Join servers\n\n' +
-			'Visit me on github: https://github.com/robertlai/ImageCollectorBot\n' +
-			'For feature requests, open a github issue.'
-		);
-		console.log('>Posted command list.');
-	}
-	else if(regex.leaderboard.test(message.content)) {
-		console.log('>Received leaderboard command.');
-		if(Data.trackScores) {
-			const leaders = _(Data.scores)
-				.map((score, id) => {
-					return {
-						id: id,
-						score: score
-					};
-				})
-				.sortBy((user) => {
-					return user.score * -1;
-				})
-				.slice(0, 10)
-				.value();
-			bot.sendMessage(
-				message.channel,
-				'**Current standings for ' + Data.currentMonth + ':**\n' +
-				_.map(leaders, (user, i) => {
-					return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
-				}).join('\n')
-			);
-			console.log('>Posted leaderboard.');
+function commonCommands(message) {
+	const tokens = message.content.split(' ')
+	if (tokens[0] === '>help') {
+		Logger.log('Received help command.')
+		const command = tokens[1]
+		const commandDocs = Docs[command]
+		if (commandDocs) {
+			message.channel.send(
+				`**>${command}**\n` +
+				`${commandDocs.description}\n` +
+				'Usage:\n' +
+				commandDocs.usage.reduce((acc, curr) => (
+					acc + `\`\`\`${curr}\`\`\``
+				), '')
+			)
+		} else {
+			message.channel.send(defaultHelp)
 		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Score tracking is not active.**'
-			);
+		Logger.log('Posted documentation.')
+	} else if (tokens[0] === '>leaderboard') {
+		Logger.log('Received leaderboard command.')
+		const collectionKey = tokens[1] || 'Default'
+		const collection = Data.collections[collectionKey]
+		if (collection && collection.features.leaderboard) {
+			const leaders = _(collection.scores)
+        .map((score, id) => ({ id, score }))
+        .sortBy((user) => user.score)
+        .slice(0, 10)
+        .value()
+
+      const leaderboardMessage = `**Current standings for ${collectionKey}: ${Data.currentMonth}` +
+        _.reduceRight(leaders, (acc, user, index) => {
+          acc += `${index + 1} - ${discord.users.get(user.id).username} (${user.score})`
+        }, '')
+
+      message.channel.send(leaderboardMessage)
+			Logger.log('Posted leaderboard.')
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-	}
-	else if(regex.albums.test(message.content)) {
-		console.log('>Received albums command.');
-		const albumList = _.map(Data.albums, (album, title) => {
-			return `- ${title}: https://imgur.com/a/${album.id} (${album.imgCount} images)`;
-		});
-		bot.sendMessage(
-			message.channel,
-			'**Albums:**\n' + albumList.join('\n')
-		);
-		console.log('>Posted album list.');
-	}
-	else if(regex.count.test(message.content)) {
-		console.log('>Received count command.');
-		bot.sendMessage(
-			message.channel,
-			`**Album ${Data.currentMonth} now contains ${Data.albums[Data.currentMonth].imgCount} images!**`
-		);
-		console.log('>Posted image count.');
-	}
-	else if(regex.channels.test(message.content)) {
-		console.log('>Received channels command.');
-		const inChannelList = _.map(Data.inChannels, (channel) => {
-			return `- ${channel.name} in ${channel.server.name}`;
-		});
-		const outChannelList = _.map(Data.outChannels, (channel) => {
-			return `- ${channel.name} in ${channel.server.name}`;
-		});
-		const announceChannelList = _.map(Data.announceChannels, (channel) => {
-			return `- ${channel.name} in ${channel.server.name}`;
-		});
-		bot.sendMessage(
-			message.channel,
-			'**Getting images from:**\n' + inChannelList.join('\n') +
-			'\n**Posting images to:**\n' + outChannelList.join('\n') +
-			'\n**Posting announcements in:**\n' + announceChannelList.join('\n')
-		);
-		console.log('>Posted channel list.');
-	}
-	else if(regex.blacklist.test(message.content)) {
-		console.log('>Received blacklist command.');
-		const blacklist = _.map(Data.blacklist, (user) => {
-			return `- ${user.username} (${user.id})`;
-		});
-		bot.sendMessage(
-			message.channel,
-			'**Blacklist:**\n' + blacklist.join('\n')
-		);
-		console.log('>Posted blacklist.');
-	}
-	else if(regex.users.test(message.content)) {
-		console.log('>Received users command.');
-		const userList = _.map(Data.users, (user) => {
-			return `- ${user.username} (${user.id})`;
-		});
-		bot.sendMessage(
-			message.channel,
-			'**Users:**\n' + userList.join('\n')
-		);
-		console.log('>Posted user list.');
-	}
-	else if(regex.admin.test(message.content)) {
-		console.log('>Received admin command.');
-		const adminList = _.map(Data.admin, (user) => {
-			return `- ${user.username} (${user.id})`;
-		});
-		bot.sendMessage(
-			message.channel,
-			'**Administrators:**\n' + adminList.join('\n')
-		);
-		console.log('>Posted admin list.');
-	}
-	else if(regex.postImg.test(message.content)) {
-		console.log('>Received postImg command.');
-		if(message.author.id === message.channel.server.ownerID) {
-			let channel = _.pick(message.channel, ['id', 'name', 'server']);
-			channel.server = _.pick(channel.server, ['id', 'name']);
-			const channelString = `${channel.name} in ${channel.server.name}`;
-			Data.outChannels = _.xorBy(Data.outChannels, [channel], 'id');
-			const addedChannel = _.map(Data.outChannels, 'id').indexOf(channel.id) !== -1;
-			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' outChannel.');
-			console.log('================================================================');
-			console.log('Channel: ' + channelString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				`**${addedChannel ? 'P' : 'No longer p'}osting images to:** ${channelString}.`
-			);
+	} else if (tokens[0] === '>albums') {
+		Logger.log('Received albums command.')
+		const collectionKey = tokens[1] || 'Default'
+		const collection = Data.collections[collectionKey]
+		if (collection) {
+			const albums = _.reduce(collection.albums, (acc, album, title) => (
+				`${acc}\n- ${title}: https://imgur.com/a/${album.id} (${album.imgCount} images)`
+			), '');
+			message.channel.send(`**Albums:**\n${albums}`)
+			Logger.log('Posted album list.')
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**This command can only be used by the server owner.**'
-			);
-			console.log('>Unauthorized.');
+	} else if (tokens[0] === '>count') {
+		Logger.log('Received count command.')
+		const collectionKey = tokens[1] || 'Default'
+		const collection = Data.collections[collectionKey]
+		if (collection) {
+			const count = collection.albums[Data.currentMonth].imgCount
+			message.channel.send(`**Album ${collectionKey}: ${Data.currentMonth} contains ${count} images.**`)
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-	}
-	else if(regex.announce.test(message.content)) {
-		console.log('>Received announce command.');
-		if(message.author.id === message.channel.server.ownerID) {
-			let channel = _.pick(message.channel, ['id', 'name', 'server']);
-			channel.server = _.pick(channel.server, ['id', 'name']);
-			const channelString = `${channel.name} in ${channel.server.name}`;
-			Data.announceChannels = _.xorBy(Data.announceChannels, [channel], 'id');
-			const addedChannel = _.map(Data.announceChannels, 'id').indexOf(channel.id) !== -1;
-			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' announceChannel.');
-			console.log('================================================================');
-			console.log('Channel: ' + channelString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				`**${addedChannel ? 'P' : 'No longer p'}osting announcements in:** ${channelString}.`
-			);
+	} else if (tokens[0] === '>channels') {
+		Logger.log('Received channels command.')
+		const collectionKey = tokens[1] || 'Default'
+		const collection = Data.collections[collectionKey]
+		if (collection) {
+			const inChannels = _.reduce(collection.inChannels, (acc, enabled, channelId) => {
+				if (!enabled) {
+					return acc
+				}
+				const channel = discord.channels.get(channelId)
+				return `${acc}\n- ${channel.name} in ${channel.guild.name}`
+			}, '')
+			const outChannels = _.reduce(collection.outChannels, (acc, enabled, channelId) => {
+				if (!enabled) {
+					return acc
+				}
+				const channel = discord.channels.get(channelId)
+				return `${acc}\n- ${channel.name} in ${channel.guild.name}`
+			}, '')
+			const announceChannels = _.reduce(collection.announceChannels, (acc, enabled, channelId) => {
+				if (!enabled) {
+					return acc
+				}
+				const channel = discord.channels.get(channelId)
+				return `${acc}\n- ${channel.name} in ${channel.guild.name}`
+			}, '')
+			message.channel.send(
+				`**Getting images from:**\n${inChannels}\n` +
+				`**Posting images to:**\n${outChannels}\n` +
+				`**Posting announcements to:**\n${announceChannels}\n`
+			)
+			Logger.log('Posted channel configuration.');
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**This command can only be used by the server owner.**'
-			);
-			console.log('>Unauthorized.');
-		}
+	} else if (message.content === '>blacklist') {
+		Logger.log('Received blacklist command.')
+		const blacklist = _.reduce(Data.blacklist, (enabled, userId) => {
+			if (!enabled) {
+				return acc
+			}
+			const user = discord.users.get(userId)
+			return `${acc}\n- ${user.tag}(${user.id})`
+		}, '')
+		message.channel.send(`**Blacklist:**\n${blacklist}`)
+		Logger.log('Posted blacklist.');
+	} else if (message.content === '>users') {
+		Logger.log('Received users command.')
+		const users = _.reduce(Data.permissions, (permission, userId) => {
+			if (permission < 1) {
+				return acc
+			}
+			const user = discord.users.get(userId)
+			return `${acc}\n- ${user.tag}(${user.id})`
+		}, '')
+		message.channel.send(`**Users:**\n${users}`)
+		Logger.log('Posted user list.');
+	} else if (message.content === '>admin') {
+		Logger.log('Received admin command.')
+		const admin = _.reduce(Data.permissions, (permission, userId) => {
+			if (permission < 2) {
+				return acc
+			}
+			const user = discord.admin.get(userId)
+			return `${acc}\n- ${user.tag}(${user.id})`
+		}, '')
+		message.channel.send(`**Admin:**\n${admin}`)
+		Logger.log('Posted admin list.');
 	}
 }
 
-export default CommonCommands;
+export default commonCommands

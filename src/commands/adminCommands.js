@@ -1,138 +1,141 @@
-import _ from 'lodash';
-import { getUsers } from '../utils';
+import discord from '../main'
+import Data from '../data'
+import Logger from '../logger'
+import { getUserIds } from '../utils'
 
-const regex = {
-	listen: /^>listen/,
-	unlisten: /^>unlisten/,
-	ignore: /^>ignore/,
-	unignore: /^>unignore/,
-	join: /^>join/,
-	join2: /^>join(\s*https?:\/\/discord\.gg\/[A-Za-z0-9]+\s*)+$/,
-	invite: /https?:\/\/discord\.gg\/[A-Za-z0-9]+/gi
-};
-
-function AdminCommands(message, bot, Data) {
-	if(regex.ignore.test(message.content)) {
-		console.log('>Received ignore command.');
-		const users = getUsers(message);
-		if(users) {
-			const usersString = _.map(users, 'username').join(', ');
-			Data.blacklist = _.unionBy(Data.blacklist, users, 'id');
-			console.log('>Ignored users.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Ignored users:** ' + usersString
-			);
+function adminCommands(message) {
+	const tokens = message.content.split(' ')
+	if (tokens[0] === '>setPermission') {
+		Logger.log('Received setPermission command.')
+		const permission = parseInt(tokens[1])
+		const userIds = getUserIds(message)
+		if (permission != null && userIds) {
+			userIds.forEach((userId) => {
+				Data.permissions[userId] = permission
+				Logger.log('Set permission.')
+				Logger.block([
+					`Author: ${message.author.tag}(${message.author.id})`,
+					`User ID: ${userId}`,
+					`Permission: ${permission}`,
+					`Time: ${new Date()}`
+				])
+			})
+			Data.writeData()
+			message.channel.send('**Set permissions.**')
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
+	} else if (tokens[0] === '>ignore') {
+		Logger.log('Received ignore command.')
+		const userIds = getUserIds(message)
+		if (userIds) {
+			userIds.forEach((userId) => {
+				Data.blacklist[userId] = true
+				Logger.log('>Ignored user.')
+				Logger.block([
+					`Author: ${message.author.tag}(${message.author.id})`,
+					`User ID: ${userId}`,
+					`Time: ${new Date()}`
+				])
+			})
+			Data.writeData()
+			message.channel.send('**Ignored Users.**')
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-	}
-	else if(regex.unignore.test(message.content)) {
-		console.log('>Received unignore command.');
-		const users = getUsers(message);
-		if(users) {
-			const usersString = _.map(users, 'username').join(', ');
-			Data.blacklist = _.differenceBy(Data.blacklist, users, 'id');
-			console.log('>Unignored users.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Unignored users:** ' + usersString
-			);
+	} else if (tokens[0] === '>unignore') {
+		Logger.log('Received unignore command.')
+		const userIds = getUserIds(message)
+		if (userIds) {
+			userIds.forEach((userId) => {
+				Data.blacklist[userId] = false
+				Logger.log('>Unignored user.')
+				Logger.block([
+					`Author: ${message.author.tag}(${message.author.id})`,
+					`User ID: ${userId}`,
+					`Time: ${new Date()}`
+				])
+			})
+			Data.writeData()
+			message.channel.send('**Unignored Users.**')
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
-		}
-	}
-	else if(regex.join.test(message.content)) {
-		console.log('>Received join command.');
-		if(regex.join2.test(message.content)) {
-			const invites = message.content.match(regex.invite);
-			_.forEach(invites, (invite) => {
-				bot.joinServer(invite);
-			});
-			bot.sendMessage(
-				message.channel,
-				'**Joined Servers.**'
-			);
-			console.log('>Joined servers.');
-		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
-		}
-	}
-	else if(regex.listen.test(message.content)) {
-		console.log('>Received listen command.');
-		const users = getUsers(message);
-		if(users) {
-			const usersString = _.map(users, 'username').join(', ');
-			Data.users = _.unionBy(Data.users, users, 'id');
-			console.log('>Added users.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Added users:** ' + usersString
-			);
-		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
-		}
-	}
-	else if(regex.unlisten.test(message.content)) {
-		console.log('>Received unlisten command.');
-		const users = getUsers(message);
-		if(users) {
-			const usersString = _.map(users, 'username').join(', ');
-			Data.users = _.differenceBy(Data.users, users, 'id');
-			console.log('>Removed users.');
-			console.log('================================================================');
-			console.log('Users: ' + usersString);
-			console.log('Time: ' + new Date());
-			console.log('================================================================');
-			Data.writeData();
-			bot.sendMessage(
-				message.channel,
-				'**Removed users:** ' + usersString
-			);
-		}
-		else {
-			bot.sendMessage(
-				message.channel,
-				'**Invalid parameters.**'
-			);
-			console.log('>Invalid parameters.');
+	} else if (tokens[0] === '>join') {
+		Logger.log('Received join command.')
+		const inviteRegex = /^>join(\s*https?:\/\/discord\.gg\/[A-Za-z0-9]+\s*)+$/
+		if (inviteRegex.test(message.content)) {
+			const invites = message.content.match(inviteRegex)
+			invites.forEach((invite) => {
+				discord.acceptInvite(invite)
+			})
+			Logger.log('Joined guilds')
+			message.channel.send('**Joined guilds.**')
+		} else {
+			Logger.log('Invalid parameters.')
+			message.channel.send('**Invalid parameters.**')
 		}
 	}
 }
 
-export default AdminCommands;
+export default adminCommands
+
+/*
+else if(regex.postImg.test(message.content)) {
+		console.log('>Received postImg command.');
+		if(message.author.id === message.channel.server.ownerID) {
+			let channel = _.pick(message.channel, ['id', 'name', 'server']);
+			channel.server = _.pick(channel.server, ['id', 'name']);
+			const channelString = `${channel.name} in ${channel.server.name}`;
+			Data.outChannels = _.xorBy(Data.outChannels, [channel], 'id');
+			const addedChannel = _.map(Data.outChannels, 'id').indexOf(channel.id) !== -1;
+			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' outChannel.');
+			console.log('================================================================');
+			console.log('Channel: ' + channelString);
+			console.log('Time: ' + new Date());
+			console.log('================================================================');
+			Data.writeData();
+			bot.sendMessage(
+				message.channel,
+				`**${addedChannel ? 'P' : 'No longer p'}osting images to:** ${channelString}.`
+			);
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**This command can only be used by the server owner.**'
+			);
+			console.log('>Unauthorized.');
+		}
+	}
+	else if(regex.announce.test(message.content)) {
+		console.log('>Received announce command.');
+		if(message.author.id === message.channel.server.ownerID) {
+			let channel = _.pick(message.channel, ['id', 'name', 'server']);
+			channel.server = _.pick(channel.server, ['id', 'name']);
+			const channelString = `${channel.name} in ${channel.server.name}`;
+			Data.announceChannels = _.xorBy(Data.announceChannels, [channel], 'id');
+			const addedChannel = _.map(Data.announceChannels, 'id').indexOf(channel.id) !== -1;
+			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' announceChannel.');
+			console.log('================================================================');
+			console.log('Channel: ' + channelString);
+			console.log('Time: ' + new Date());
+			console.log('================================================================');
+			Data.writeData();
+			bot.sendMessage(
+				message.channel,
+				`**${addedChannel ? 'P' : 'No longer p'}osting announcements in:** ${channelString}.`
+			);
+		}
+		else {
+			bot.sendMessage(
+				message.channel,
+				'**This command can only be used by the server owner.**'
+			);
+			console.log('>Unauthorized.');
+		}
+	}
+	*/

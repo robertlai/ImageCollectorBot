@@ -16,8 +16,7 @@ const regex = {
 function CommonCommands(message, bot, Data) {
 	if(regex.help.test(message.content)) {
 		console.log('>Received help command.');
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			'**Common commands:**\n' +
 			'>help - List commands\n' +
 			'>users - List users in user list\n' +
@@ -37,7 +36,7 @@ function CommonCommands(message, bot, Data) {
 			'>unlisten - Remove users from the user list\n' +
 			'>ignore - Add users to the blacklist\n' +
 			'>unignore - Remove users from the blacklist\n' +
-			'>join - Join servers\n\n' +
+			'>join - Join guilds\n\n' +
 			'Visit me on github: https://github.com/robertlai/ImageCollectorBot\n' +
 			'For feature requests, open a github issue.'
 		);
@@ -58,8 +57,7 @@ function CommonCommands(message, bot, Data) {
 				})
 				.slice(0, 10)
 				.value();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Current standings for ' + Data.currentMonth + ':**\n' +
 				_.map(leaders, (user, i) => {
 					return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
@@ -68,8 +66,7 @@ function CommonCommands(message, bot, Data) {
 			console.log('>Posted leaderboard.');
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Score tracking is not active.**'
 			);
 		}
@@ -79,16 +76,14 @@ function CommonCommands(message, bot, Data) {
 		const albumList = _.map(Data.albums, (album, title) => {
 			return `- ${title}: https://imgur.com/a/${album.id} (${album.imgCount} images)`;
 		});
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			'**Albums:**\n' + albumList.join('\n')
 		);
 		console.log('>Posted album list.');
 	}
 	else if(regex.count.test(message.content)) {
 		console.log('>Received count command.');
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			`**Album ${Data.currentMonth} now contains ${Data.albums[Data.currentMonth].imgCount} images!**`
 		);
 		console.log('>Posted image count.');
@@ -96,16 +91,15 @@ function CommonCommands(message, bot, Data) {
 	else if(regex.channels.test(message.content)) {
 		console.log('>Received channels command.');
 		const inChannelList = _.map(Data.inChannels, (channel) => {
-			return `- ${channel.name} in ${channel.server.name}`;
+			return `- ${channel.name} in ${channel.guild.name}`;
 		});
 		const outChannelList = _.map(Data.outChannels, (channel) => {
-			return `- ${channel.name} in ${channel.server.name}`;
+			return `- ${channel.name} in ${channel.guild.name}`;
 		});
 		const announceChannelList = _.map(Data.announceChannels, (channel) => {
-			return `- ${channel.name} in ${channel.server.name}`;
+			return `- ${channel.name} in ${channel.guild.name}`;
 		});
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			'**Getting images from:**\n' + inChannelList.join('\n') +
 			'\n**Posting images to:**\n' + outChannelList.join('\n') +
 			'\n**Posting announcements in:**\n' + announceChannelList.join('\n')
@@ -117,8 +111,7 @@ function CommonCommands(message, bot, Data) {
 		const blacklist = _.map(Data.blacklist, (user) => {
 			return `- ${user.username} (${user.id})`;
 		});
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			'**Blacklist:**\n' + blacklist.join('\n')
 		);
 		console.log('>Posted blacklist.');
@@ -128,8 +121,7 @@ function CommonCommands(message, bot, Data) {
 		const userList = _.map(Data.users, (user) => {
 			return `- ${user.username} (${user.id})`;
 		});
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			'**Users:**\n' + userList.join('\n')
 		);
 		console.log('>Posted user list.');
@@ -139,18 +131,17 @@ function CommonCommands(message, bot, Data) {
 		const adminList = _.map(Data.admin, (user) => {
 			return `- ${user.username} (${user.id})`;
 		});
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			'**Administrators:**\n' + adminList.join('\n')
 		);
 		console.log('>Posted admin list.');
 	}
 	else if(regex.postImg.test(message.content)) {
 		console.log('>Received postImg command.');
-		if(message.author.id === message.channel.server.ownerID) {
-			let channel = _.pick(message.channel, ['id', 'name', 'server']);
-			channel.server = _.pick(channel.server, ['id', 'name']);
-			const channelString = `${channel.name} in ${channel.server.name}`;
+		if(message.author.id === message.guild.ownerID) {
+			let channel = _.pick(message.channel, ['id', 'name', 'guild']);
+			channel.guild = _.pick(channel.guild, ['id', 'name']);
+			const channelString = `${channel.name} in ${channel.guild.name}`;
 			Data.outChannels = _.xorBy(Data.outChannels, [channel], 'id');
 			const addedChannel = _.map(Data.outChannels, 'id').indexOf(channel.id) !== -1;
 			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' outChannel.');
@@ -159,25 +150,23 @@ function CommonCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				`**${addedChannel ? 'P' : 'No longer p'}osting images to:** ${channelString}.`
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
-				'**This command can only be used by the server owner.**'
+			message.channel.send(
+				'**This command can only be used by the guild owner.**'
 			);
 			console.log('>Unauthorized.');
 		}
 	}
 	else if(regex.announce.test(message.content)) {
 		console.log('>Received announce command.');
-		if(message.author.id === message.channel.server.ownerID) {
-			let channel = _.pick(message.channel, ['id', 'name', 'server']);
-			channel.server = _.pick(channel.server, ['id', 'name']);
-			const channelString = `${channel.name} in ${channel.server.name}`;
+		if(message.author.id === message.guild.ownerID) {
+			let channel = _.pick(message.channel, ['id', 'name', 'guild']);
+			channel.guild = _.pick(channel.guild, ['id', 'name']);
+			const channelString = `${channel.name} in ${channel.guild.name}`;
 			Data.announceChannels = _.xorBy(Data.announceChannels, [channel], 'id');
 			const addedChannel = _.map(Data.announceChannels, 'id').indexOf(channel.id) !== -1;
 			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' announceChannel.');
@@ -186,15 +175,13 @@ function CommonCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				`**${addedChannel ? 'P' : 'No longer p'}osting announcements in:** ${channelString}.`
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
-				'**This command can only be used by the server owner.**'
+			message.channel.send(
+				'**This command can only be used by the guild owner.**'
 			);
 			console.log('>Unauthorized.');
 		}

@@ -15,14 +15,13 @@ function CollectImages(message, bot, Data) {
 	if(!_.isEmpty(images)) {
 		console.log('>Found images.');
 		console.log('================================================================');
-		console.log('Server: ' + message.channel.server.name + '(' + message.channel.server.id + ')');
+		console.log('Guild: ' + message.guild.name + '(' + message.guild.id + ')');
 		console.log('Channel: ' + message.channel.name + '(' + message.channel.id + ')');
 		console.log('Author: ' + message.author.username + '(' + message.author.id + ')');
 		console.log('================================================================');
 		_.forEach(Data.outChannels, (outChannel) => {
-			bot.sendMessage(
-				outChannel.id,
-				'**Server:** `' + message.channel.server.name + '`\n' +
+			bot.channels.get(outChannel.id).send(
+				'**Guild:** `' + message.guild.name + '`\n' +
 				'**Channel:** `' + message.channel.name + '`\n' +
 				'**User:** `' + message.author.username + '(' + message.author.id + ')`\n' +
 				images.join('\n')
@@ -48,8 +47,7 @@ function CollectImages(message, bot, Data) {
 					.value();
 
 				_.forEach(Data.announceChannels, (announceChannel) => {
-					bot.sendMessage(
-						announceChannel.id,
+					bot.channels.get(announceChannel.id).send(
 						'**Final standings for ' + Data.currentMonth + ':**\n' +
 						_.map(leaders, (user, i) => {
 							return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;

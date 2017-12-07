@@ -54,7 +54,7 @@ const imgur = {
 					image: image,
 					album: Data.albums[Data.currentMonth].deleteHash,
 					type: 'URL',
-					description: 'Server: ' + message.channel.server.name + '\n' +
+					description: 'Server: ' + message.guild.name + '\n' +
 						'Channel: ' + message.channel.name + '\n' +
 						'User: ' + message.author.username + '(' + message.author.id + ')'
 				}
@@ -79,8 +79,7 @@ const imgur = {
 
 					if(imgCount % Data.interval === 0) {
 						_.forEach(Data.announceChannels, (announceChannel) => {
-							bot.sendMessage(
-								announceChannel.id,
+							bot.channels.get(announceChannel.id).sendMessage(
 								`**Album ${Data.currentMonth} now contains ${imgCount} images!**`
 							);
 						});
@@ -112,8 +111,7 @@ const imgur = {
 				console.log('Album: ' + album);
 				console.log('Images: ' + images);
 				console.log('================================================================');
-				bot.sendMessage(
-					message.channel,
+				message.channel.sendMessage(
 					`**Deleted images.**`
 				);
 			}

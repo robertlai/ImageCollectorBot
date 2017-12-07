@@ -8,9 +8,9 @@ const regex = {
 
 function CollectImages(message, bot, Data) {
 	const urls = message.content.match(regex.image_url);
-	const attachments = _.filter(_.map(message.attachments, 'url'), (attachment) => {
-		return regex.image_attach.test(attachment);
-	});
+	const attachments = message.attachments
+		.filter(a => regex.image_attach.test(a.url))
+		.map(a => a.url)
 	const images = _.union(urls, attachments);
 	if(!_.isEmpty(images)) {
 		console.log('>Found images.');

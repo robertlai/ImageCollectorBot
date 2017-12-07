@@ -60,7 +60,7 @@ function CommonCommands(message, bot, Data) {
 			message.channel.send(
 				'**Current standings for ' + Data.currentMonth + ':**\n' +
 				_.map(leaders, (user, i) => {
-					return `${i + 1} - ${bot.users.get('id', user.id).username} (${user.score})`;
+					return `${i + 1} - ${bot.users.get(user.id).username} (${user.score})`;
 				}).join('\n')
 			);
 			console.log('>Posted leaderboard.');

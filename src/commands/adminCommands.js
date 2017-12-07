@@ -24,14 +24,12 @@ function AdminCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Ignored users:** ' + usersString
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');
@@ -49,14 +47,12 @@ function AdminCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Unignored users:** ' + usersString
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');
@@ -69,15 +65,13 @@ function AdminCommands(message, bot, Data) {
 			_.forEach(invites, (invite) => {
 				bot.joinServer(invite);
 			});
-			bot.sendMessage(
-				message.channel,
-				'**Joined Servers.**'
+			message.channel.send(
+				'**Joined Guilds.**'
 			);
-			console.log('>Joined servers.');
+			console.log('>Joined guilds.');
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');
@@ -95,14 +89,12 @@ function AdminCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Added users:** ' + usersString
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');
@@ -120,14 +112,12 @@ function AdminCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Removed users:** ' + usersString
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');

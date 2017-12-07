@@ -14,8 +14,7 @@ function OwnerCommands(message, bot, Data) {
 	if(regex.reload.test(message.content)) {
 		console.log('>Received reload command.');
 		Data.loadData();
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			'**Reloaded data.**'
 		);
 		console.log('>Reloaded data.');
@@ -32,14 +31,12 @@ function OwnerCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Added administrators:** ' + usersString
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');
@@ -57,14 +54,12 @@ function OwnerCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Removed administrators:** ' + usersString
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');
@@ -81,14 +76,12 @@ function OwnerCommands(message, bot, Data) {
 			console.log('Time: ' + new Date());
 			console.log('================================================================');
 			Data.writeData();
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				`**Set announcement interval to: ${interval}**`
 			);
 		}
 		else {
-			bot.sendMessage(
-				message.channel,
+			message.channel.send(
 				'**Invalid parameters.**'
 			);
 			console.log('>Invalid parameters.');
@@ -103,8 +96,7 @@ function OwnerCommands(message, bot, Data) {
 		console.log('Time: ' + new Date());
 		console.log('================================================================');
 		Data.writeData();
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			`**${Data.upload ? 'U' : 'No longer u'}ploading images to imgur.**`
 		);
 	}
@@ -117,8 +109,7 @@ function OwnerCommands(message, bot, Data) {
 		console.log('Time: ' + new Date());
 		console.log('================================================================');
 		Data.writeData();
-		bot.sendMessage(
-			message.channel,
+		message.channel.send(
 			`**${Data.trackScores ? 'T' : 'No longer t'}racking scores.**`
 		);
 	}

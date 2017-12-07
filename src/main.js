@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import request from 'request';
 import Discord from 'discord.js';
 
 import Config from '../config.conf';
@@ -16,17 +17,17 @@ var bot = new Discord.Client();
 bot.on('ready', () => {
 	console.log('>Logged in.');
 	console.log('================================================================');
-	console.log('Username: ' + bot.internal.user.username);
-	console.log('UserID: ' + bot.internal.user.id);
-	console.log('Server count: ' + bot.internal.servers.length);
-	console.log('Channel count: ' + bot.internal.channels.length);
+	console.log('Username: ' + bot.user.username);
+	console.log('UserID: ' + bot.user.id);
+	console.log('Server count: ' + bot.guilds.size);
+	console.log('Channel count: ' + bot.channels.size);
 	console.log('Time: ' + new Date());
 	console.log('================================================================');
 	console.log('>Listening...');
 });
 
 bot.on('message', (message) => {
-	if(message.author.id === bot.internal.user.id || bot.users.get('id', message.author.id).bot) {
+	if(message.author.id === bot.user.id || bot.users.get(message.author.id).bot) {
 		return;
 	}
 	if(message.author.id === Config.owner) {
@@ -54,6 +55,15 @@ bot.on('message', (message) => {
 	}
 });
 
-bot.login(Config.email, Config.password, () => {
-	console.log('>Logging in...');
-});
+request.post(
+  'https://discordapp.com/api/v6/auth/login',
+  { json: { email: Config.email, password: Config.password } },
+  (err, res, body) => {
+    if (err || res.statusCode !== 200) {
+      console.log(`Failed login: ${err || res.statusCode}`);
+      return;
+    }
+    console.log(`Token: ${body.token}`);
+    bot.login(body.token);
+  }
+);

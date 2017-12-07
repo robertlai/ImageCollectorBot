@@ -26,3 +26,5 @@ node_modules
 # Bot configuration and data
 *.conf
 data.json
+*.bak
+dist

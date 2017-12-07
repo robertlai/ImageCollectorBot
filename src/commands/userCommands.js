@@ -10,8 +10,9 @@ function UserCommands(message, bot, Data) {
 	if(regex.getImg.test(message.content)) {
 		console.log('>Received getImg command.');
 		var channel = _.pick(message.channel, ['id', 'name', 'guild']);
-		channel.guild = _.pick(channel.guild, ['id', 'name']);
-		const channelString = `${channel.name} in ${channel.guild.name}`;
+		channel.server = _.pick(channel.guild, ['id', 'name']);
+		channel.guild = undefined;
+		const channelString = `${channel.name} in ${channel.server.name}`;
 		Data.inChannels = _.xorBy(Data.inChannels, [channel], 'id');
 		const addedChannel = _.map(Data.inChannels, 'id').indexOf(channel.id) !== -1;
 		console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' inChannel.');

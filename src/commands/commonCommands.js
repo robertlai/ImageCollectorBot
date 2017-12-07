@@ -91,13 +91,13 @@ function CommonCommands(message, bot, Data) {
 	else if(regex.channels.test(message.content)) {
 		console.log('>Received channels command.');
 		const inChannelList = _.map(Data.inChannels, (channel) => {
-			return `- ${channel.name} in ${channel.guild.name}`;
+			return `- ${channel.name} in ${channel.server.name}`;
 		});
 		const outChannelList = _.map(Data.outChannels, (channel) => {
-			return `- ${channel.name} in ${channel.guild.name}`;
+			return `- ${channel.name} in ${channel.server.name}`;
 		});
 		const announceChannelList = _.map(Data.announceChannels, (channel) => {
-			return `- ${channel.name} in ${channel.guild.name}`;
+			return `- ${channel.name} in ${channel.server.name}`;
 		});
 		message.channel.send(
 			'**Getting images from:**\n' + inChannelList.join('\n') +
@@ -140,8 +140,9 @@ function CommonCommands(message, bot, Data) {
 		console.log('>Received postImg command.');
 		if(message.author.id === message.guild.ownerID) {
 			let channel = _.pick(message.channel, ['id', 'name', 'guild']);
-			channel.guild = _.pick(channel.guild, ['id', 'name']);
-			const channelString = `${channel.name} in ${channel.guild.name}`;
+			channel.server = _.pick(channel.guild, ['id', 'name']);
+			channel.guild = undefined;
+			const channelString = `${channel.name} in ${channel.server.name}`;
 			Data.outChannels = _.xorBy(Data.outChannels, [channel], 'id');
 			const addedChannel = _.map(Data.outChannels, 'id').indexOf(channel.id) !== -1;
 			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' outChannel.');
@@ -165,8 +166,9 @@ function CommonCommands(message, bot, Data) {
 		console.log('>Received announce command.');
 		if(message.author.id === message.guild.ownerID) {
 			let channel = _.pick(message.channel, ['id', 'name', 'guild']);
-			channel.guild = _.pick(channel.guild, ['id', 'name']);
-			const channelString = `${channel.name} in ${channel.guild.name}`;
+			channel.server = _.pick(channel.guild, ['id', 'name']);
+			channel.guild = undefined;
+			const channelString = `${channel.name} in ${channel.server.name}`;
 			Data.announceChannels = _.xorBy(Data.announceChannels, [channel], 'id');
 			const addedChannel = _.map(Data.announceChannels, 'id').indexOf(channel.id) !== -1;
 			console.log('>' + (addedChannel ? 'Added' : 'Removed') + ' announceChannel.');
